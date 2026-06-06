@@ -1,0 +1,43 @@
+name: Veille marchés publics
+
+on:
+  schedule:
+    # ATTENTION : GitHub utilise l'heure UTC.
+    # 7h heure de Paris = 6h UTC en été, 5h UTC en hiver.
+    # On lance à 5h ET 6h UTC pour être à 7h Paris toute l'année
+    # (le doublon week-end est sans gravité ; en semaine ça évite de rater l'heure).
+    - cron: "0 5 * * *"
+    - cron: "0 6 * * *"
+  # Permet aussi de lancer manuellement depuis l'onglet "Actions" de GitHub
+  workflow_dispatch:
+
+jobs:
+  veille:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+
+      - name: Lancer la veille
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          DEPARTEMENTS: ${{ secrets.DEPARTEMENTS }}
+          MOTS_CLES: ${{ secrets.MOTS_CLES }}
+          LOOKBACK_DAYS: ${{ secrets.LOOKBACK_DAYS }}
+          SEND_IF_EMPTY: ${{ secrets.SEND_IF_EMPTY }}
+          ANTHROPIC_MODEL: ${{ secrets.ANTHROPIC_MODEL }}
+          # Lancement planifié = on respecte l'heure (7h Paris).
+          # Lancement manuel = on exécute tout de suite.
+          ENFORCE_HOUR: ${{ github.event_name == 'schedule' && 'true' || 'false' }}
+        run: python main.py
