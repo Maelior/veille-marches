@@ -34,7 +34,6 @@ jobs:
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
           DEPARTEMENTS: ${{ secrets.DEPARTEMENTS }}
           MOTS_CLES: ${{ secrets.MOTS_CLES }}
-          LOOKBACK_DAYS: ${{ secrets.LOOKBACK_DAYS }}
           SEND_IF_EMPTY: ${{ secrets.SEND_IF_EMPTY }}
           ANTHROPIC_MODEL: ${{ secrets.ANTHROPIC_MODEL }}
           # Lancement planifié = on respecte l'heure (7h Paris).
